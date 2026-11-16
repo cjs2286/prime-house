@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>프라임하우스 입주민 공간</title>
+<style>
+:root {
+  --cream: #FBF8F2; --yellow: #FFF3D6; --yellow-deep: #F5D978;
+  --sky: #D6ECFB; --sky-deep: #8FCBEF; --lavender: #E8E0FB; --lavender-deep: #BBA3EC;
+  --mint: #D9F2E6; --mint-deep: #7FCDAA; --ink: #2B2620; --ink-soft: #6B6356;
+  --line: #E7E0D2; --card-bg: #FFFFFF; --danger: #D9534F; --radius: 20px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cream: #1C1A16; --yellow: #3A341F; --yellow-deep: #5C512A;
+    --sky: #1C2F3A; --sky-deep: #2E4F63; --lavender: #2A2440; --lavender-deep: #453A6B;
+    --mint: #1D3328; --mint-deep: #2E5443; --ink: #F3EFE6; --ink-soft: #B7AE9C;
+    --line: #38332A; --card-bg: #24211C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --cream: #1C1A16; --yellow: #3A341F; --yellow-deep: #5C512A;
+  --sky: #1C2F3A; --sky-deep: #2E4F63; --lavender: #2A2440; --lavender-deep: #453A6B;
+  --mint: #1D3328; --mint-deep: #2E5443; --ink: #F3EFE6; --ink-soft: #B7AE9C;
+  --line: #38332A; --card-bg: #24211C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--cream); color: var(--ink);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 50; background: var(--cream);
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+#gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.gate-card { background: var(--card-bg); border-radius: 28px; padding: 36px 28px; max-width: 380px; width: 100%; border: 3px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); text-align: center; }
+.gate-emoji { font-size: 44px; margin-bottom: 4px; }
+.gate-card h1 { font-size: 20px; margin: 8px 0 4px; font-weight: 800; }
+.gate-card p { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; line-height: 1.5; }
+.gate-input { width: 100%; padding: 14px 16px; border-radius: 16px; border: 2.5px solid var(--ink); background: var(--cream); font-size: 16px; color: var(--ink); margin-bottom: 10px; text-align: center; letter-spacing: 0.5px; font-weight: 700; }
+.gate-input:focus { outline: none; border-color: var(--sky-deep); }
+.gate-btn { width: 100%; padding: 14px; border-radius: 16px; border: 2.5px solid var(--ink); background: var(--ink); color: var(--cream); font-size: 15px; font-weight: 800; margin-top: 6px; }
+.gate-error { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 16px; }
+.gate-hint { font-size: 12px; color: var(--ink-soft); margin-top: 14px; }
+
+#app { display: none; max-width: 980px; margin: 0 auto; padding: 16px 16px 60px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 4px 16px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; letter-spacing: -0.3px; }
+.brand span.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--mint-deep); }
+
+.tabs-wrap { position: relative; }
+.tabs-wrap::after { content: ""; position: absolute; top: 0; right: 0; width: 28px; height: calc(100% - 14px); background: linear-gradient(to right, transparent, var(--cream)); pointer-events: none; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px; -webkit-overflow-scrolling: touch; }
+.tab-btn { flex: 0 0 auto; background: var(--card-bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; border: 2.5px solid var(--ink); }
+.tab-btn.active { background: var(--yellow-deep); color: var(--ink); border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.block { border-radius: var(--radius); padding: 22px 20px 20px; margin-bottom: 16px; border: 2.5px solid var(--ink); position: relative; }
+.block h2 { font-size: 15.5px; margin: 0 0 14px; display: flex; align-items: center; gap: 6px; font-weight: 800; }
+.bg-yellow { background: var(--yellow); border-top: 7px solid var(--yellow-deep); }
+.bg-sky { background: var(--sky); border-top: 7px solid var(--sky-deep); }
+.bg-lavender { background: var(--lavender); border-top: 7px solid var(--lavender-deep); }
+.bg-mint { background: var(--mint); border-top: 7px solid var(--mint-deep); }
+.bg-white { background: var(--card-bg); border-top: 7px solid var(--ink); }
+
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 720px) { .home-grid { grid-template-columns: 1fr; } }
+.photo-box { width: 100%; aspect-ratio: 16/10; border-radius: 14px; overflow: hidden; background: var(--card-bg); display: flex; align-items: center; justify-content: center; color: var(--ink-soft); font-size: 13px; margin-bottom: 12px; border: 2.5px dashed var(--ink); }
+.photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-box-portrait { aspect-ratio: auto; height: 260px; }
+.contact-row { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; border: 2px solid var(--ink); }
+.contact-row .c-label { font-weight: 700; font-size: 13.5px; }
+.contact-row .c-note { font-size: 11.5px; color: var(--ink-soft); display: block; }
+.trash-row { display: grid; grid-template-columns: 50px 1fr; gap: 10px; align-items: center; padding: 6px 0; font-size: 13.5px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.trash-row:last-child { border-bottom: none; }
+.trash-extra-note { font-size: 11.5px; color: var(--ink-soft); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.ext-summary-ok { color: var(--mint-deep); }
+.ext-summary-warn { color: var(--danger); }
+.trash-row .d { font-weight: 800; }
+.mini-report { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 2px solid var(--ink); }
+.mini-report .mr-top { display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; }
+.mini-report .mr-title { font-weight: 700; font-size: 13.5px; }
+.ext-badge { border-radius: 999px; padding: 2px 9px; font-size: 10.5px; font-weight: 800; border: 2px solid var(--ink); }
+.ext-overdue { background: var(--danger); color: #fff; }
+.ext-soon { background: var(--yellow-deep); color: var(--ink); }
+.ext-ok { background: var(--mint-deep); color: var(--ink); }
+.parking-diagram { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: var(--card-bg); border: 2.5px solid var(--ink); border-radius: 14px; margin-bottom: 12px; max-width: 100%; box-sizing: border-box; }
+.pm-col { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; }
+.ps-label { font-size: 11.5px; font-weight: 800; color: var(--ink-soft); margin-bottom: 6px; }
+.parking-grid { display: grid; gap: 4px; flex-shrink: 0; }
+.parking-grid.front { grid-template-columns: repeat(2, 42px); grid-template-rows: repeat(3, 27px); }
+.parking-grid.back { grid-template-columns: repeat(2, 27px); grid-template-rows: 42px; margin-left: 8px; }
+.parking-spot { background: var(--lavender); border: 1.5px solid var(--ink); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; }
+.pm-building { background: var(--sky-deep); color: #fff; border: 1.5px solid var(--ink); border-radius: 8px; width: 38px; height: 93px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10.5px; }
+.pm-road { background: var(--sky-deep); color: #fff; border: 1.5px solid var(--ink); border-radius: 8px; width: 28px; height: 93px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10.5px; }
+.info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.info-row:last-child { border-bottom: none; }
+.info-row .k { color: var(--ink-soft); }
+.info-row .v { font-weight: 600; }
+
+.res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (max-width: 480px) {
+  .res-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .res-card { padding: 18px 14px; }
+  .res-unit { font-size: 18px; }
+  .res-car { font-size: 13.5px; margin-bottom: 12px; }
+  .call-btn { padding: 9px 16px; font-size: 13px; }
+}
+.res-card { background: var(--card-bg); border-radius: 16px; padding: 16px; border: 2.5px solid var(--ink); text-align: center; border-top-width: 6px; }
+.res-card:nth-child(3n+1) { border-top-color: var(--yellow-deep); }
+.res-card:nth-child(3n+2) { border-top-color: var(--sky-deep); }
+.res-card:nth-child(3n+3) { border-top-color: var(--lavender-deep); }
+.res-unit { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.res-car { font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; }
+.call-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--mint-deep); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 800; }
+.call-btn.disabled { background: var(--card-bg); color: var(--ink-soft); border-color: var(--line); pointer-events: none; }
+
+.report-item { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 10px; border: 2.5px solid var(--ink); }
+.report-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.report-date { font-size: 12px; color: var(--ink-soft); }
+.report-cat { font-size: 11px; padding: 3px 10px; border-radius: 999px; background: var(--sky); font-weight: 800; border: 2px solid var(--ink); }
+.report-title { font-size: 15.5px; font-weight: 800; margin: 2px 0 4px; }
+.report-company { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+.report-desc { font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; }
+.empty-note { color: var(--ink-soft); font-size: 13.5px; text-align: center; padding: 24px 0; }
+
+.admin-locked { text-align: center; padding: 60px 20px; color: var(--ink-soft); }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 5px; font-weight: 600; }
+.field input, .field textarea, .field select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card-bg); color: var(--ink); font-size: 14px; }
+.field textarea { min-height: 70px; resize: vertical; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+@media (max-width: 560px) { .row2, .row3 { grid-template-columns: 1fr; } }
+.btn { border: 2px solid var(--ink); border-radius: 12px; padding: 10px 16px; font-size: 13.5px; font-weight: 800; background: var(--ink); color: var(--cream); }
+.btn.secondary { background: var(--card-bg); color: var(--ink); border: 2px solid var(--ink); }
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.small { padding: 7px 12px; font-size: 12.5px; }
+.admin-list-item { display: flex; align-items: center; gap: 8px; background: var(--card-bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; border: 2px solid var(--ink); }
+.admin-list-item .grow { flex: 1; }
+.save-bar { display: flex; justify-content: center; margin-top: 24px; padding-top: 14px; border-top: 2px dashed var(--line); }
+.save-bar button { padding: 13px 28px; border-radius: 999px; font-size: 14.5px; box-shadow: 4px 4px 0 var(--ink); }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--cream); padding: 10px 20px; border-radius: 999px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 100; }
+.toast.show { opacity: 1; }
+.meta-note { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+.divider { height: 1px; background: var(--line); margin: 18px 0; }
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-emoji">🏠</div>
+    <h1>프라임하우스 입주민 공간</h1>
+    <p>등록된 전화번호 또는 공용 암호를 입력해주세요</p>
+    <input id="gateInput" class="gate-input" type="text" inputmode="numeric" placeholder="전화번호 또는 암호" autocomplete="off">
+    <button class="gate-btn" onclick="tryEnter()">입장하기</button>
+    <div class="gate-error" id="gateError"></div>
+    <div class="gate-hint">이 공간은 입주민 전용입니다</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>프라임하우스</div>
+  </div>
+  <div class="tabs-wrap"><div class="tabs" id="tabBar"></div></div>
+
+  <div id="view-home" class="view">
+    <p style="font-size:13.5px; color:var(--ink-soft); margin:0 0 14px; padding:0 2px;">프라임하우스 입주민을 위한 페이지입니다.</p>
+    <div class="home-grid">
+      <div>
+        <div class="block bg-sky" style="margin-bottom:14px;">
+          <h2>🏢 건물 정보</h2>
+          <div class="photo-box photo-box-portrait" id="buildingPhotoBox">사진 준비 중</div>
+          <div class="info-row"><span class="k">주소</span><span class="v" id="hAddress">-</span></div>
+        </div>
+        <div class="block bg-lavender">
+          <h2>🚗 주차장</h2>
+          <div id="parkingPhotoBox"></div>
+          <div class="info-row"><span class="k">주차 면수</span><span class="v" id="pSpots">-</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="block bg-mint" style="margin-bottom:14px;">
+          <h2>☎️ 비상 연락처</h2>
+          <div id="emergencyList"></div>
+        </div>
+        <div class="block bg-yellow" style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:6px;">
+            <h2 style="margin:0;">🗑️ 분리수거 요일표 <span id="trashTimeLabel" style="font-size:12px; color:var(--ink-soft); font-weight:600;"></span></h2>
+            <a id="trashLinkBtn" class="call-btn" href="#" target="_blank" rel="noopener" style="display:none;">🔗 링크</a>
+          </div>
+          <div id="trashTable"></div>
+        </div>
+        <div class="block bg-white" style="margin-bottom:14px; padding:16px 20px;">
+          <div id="extSummaryText" style="font-size:13.5px; font-weight:700;"></div>
+        </div>
+        <div class="block bg-white">
+          <h2>📋 최근 공지 (2건)</h2>
+          <div id="recentReports"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-residents" class="view">
+    <div class="block bg-white">
+      <h2>👥 입주자 정보</h2>
+      <div class="res-grid" id="residentGrid"></div>
+    </div>
+  </div>
+
+  <div id="view-extinguisher" class="view">
+    <div class="block bg-white">
+      <h2>🧯 소화기 현황</h2>
+      <div id="extinguisherList"></div>
+    </div>
+  </div>
+
+  <div id="view-reports" class="view">
+    <div class="block bg-white">
+      <h2>🛠️ 관리 리포트</h2>
+      <div id="reportList"></div>
+    </div>
+  </div>
+
+  <div id="view-admin" class="view">
+    <div id="adminLocked" class="admin-locked" style="display:none;">🔒 관리자만 이용할 수 있는 탭이에요</div>
+    <div id="adminContent" style="display:none;">
+      <div class="block bg-yellow">
+        <h2>🔑 입장 코드 (전화번호)</h2>
+        <div id="phoneList"></div>
+        <div class="row3">
+          <div class="field" style="margin-bottom:0;"><label>호수(메모)</label><input id="newPhoneLabel" placeholder="예: 201호"></div>
+          <div class="field" style="margin-bottom:0;"><label>전화번호</label><input id="newPhoneNum" placeholder="01012345678" inputmode="numeric"></div>
+          <button class="btn small" id="addPhoneBtn" onclick="addPhone()">추가</button>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+          <label>공용 암호 (선택사항, 전체 입주민 공유용)</label>
+          <div class="row3">
+            <input id="sharedPwInput" placeholder="예: 2026" style="grid-column: span 2;">
+            <button class="btn small" onclick="setSharedPw()">설정</button>
+          </div>
+          <div class="meta-note" id="sharedPwMeta">설정된 공용 암호 없음</div>
+        </div>
+      </div>
+
+      <div class="block bg-sky">
+        <h2>🏢 건물 정보 수정</h2>
+        <div class="field"><label>주소</label><input id="editAddress" onchange="STATE.building.address=this.value"></div>
+        <div class="field"><label>건물 외관 사진</label><input type="file" accept="image/*" id="fileBuilding" onchange="uploadPhoto(this,'building')"></div>
+        <div class="divider"></div>
+        <div class="field"><label>주차 면수</label><input id="editSpots" onchange="STATE.parking.spots=this.value"></div>
+
+      </div>
+
+      <div class="block bg-mint">
+        <h2>☎️ 비상 연락처 수정</h2>
+        <div id="emergencyEditList"></div>
+        <div class="row3">
+          <div class="field" style="margin-bottom:0;"><label>이름/역할</label><input id="newEmergLabel" placeholder="예: 동 대표(201호)"></div>
+          <div class="field" style="margin-bottom:0;"><label>전화번호</label><input id="newEmergPhone" placeholder="01000000000" inputmode="numeric"></div>
+          <button class="btn small" id="addEmergBtn" onclick="addEmergency()">추가</button>
+        </div>
+        <div class="field"><label>비고 (선택)</label><input id="newEmergNote" placeholder="예: 평일 10:30~17:00"></div>
+      </div>
+
+      <div class="block bg-yellow">
+        <h2>🗑️ 분리수거 요일표 수정</h2>
+        <div id="trashScheduleEdit"></div>
+        <div class="divider"></div>
+        <div class="field"><label>배출 가능 시간 (선택)</label><input id="editTrashTime" placeholder="예: 18:00 ~ 24:00" onchange="STATE.trashTime=this.value"></div>
+        <div class="row2">
+          <div class="field"><label>참고 링크 이름 (선택)</label><input id="editTrashLinkLabel" placeholder="예: 광진구 분리수거 안내" onchange="STATE.trashLink=STATE.trashLink||{}; STATE.trashLink.label=this.value"></div>
+          <div class="field"><label>참고 링크 주소 (선택)</label><input id="editTrashLinkUrl" placeholder="https://..." onchange="STATE.trashLink=STATE.trashLink||{}; STATE.trashLink.url=this.value"></div>
+        </div>
+      </div>
+
+      <div class="block bg-lavender">
+        <h2>👥 입주자 정보 수정</h2>
+        <div id="residentEditList"></div>
+      </div>
+
+      <div class="block bg-sky">
+        <h2>🧯 소화기 현황 관리</h2>
+        <div id="extinguisherEditList"></div>
+        <div class="row2">
+          <div class="field"><label>위치</label><input id="newExtLocation" placeholder="예: 1층 복도"></div>
+          <div class="field"><label>구매 연월</label><input type="month" id="newExtPurchase"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>수량</label><input id="newExtQty" placeholder="예: 1"></div>
+          <div class="field"><label>최근 점검일</label><input type="date" id="newExtCheck"></div>
+        </div>
+        <div class="field"><label>비고</label><input id="newExtNote" placeholder="특이사항"></div>
+        <button class="btn small" id="addExtBtn" onclick="addExtinguisher()">추가</button>
+      </div>
+
+      <div class="block bg-mint">
+        <h2>🛠️ 관리 리포트 작성</h2>
+        <div class="row2">
+          <div class="field"><label>날짜</label><input type="date" id="newReportDate"></div>
+          <div class="field"><label>분류</label>
+            <select id="newReportCat"><option>시설 점검</option><option>보수 공사</option><option>청소</option><option>안내</option><option>기타</option></select>
+          </div>
+        </div>
+        <div class="field"><label>제목</label><input id="newReportTitle" placeholder="예: 승강기 정기검사"></div>
+        <div class="field"><label>업체명</label><input id="newReportCompany" placeholder="예: OO엘리베이터"></div>
+        <div class="field"><label>내용</label><textarea id="newReportDesc"></textarea></div>
+        <button class="btn small" id="addReportBtn" onclick="addReport()">리포트 등록</button>
+        <div class="divider"></div>
+        <div id="reportEditList"></div>
+      </div>
+
+      <div class="save-bar"><button class="btn" onclick="saveAll()">변경사항 저장 (전체 반영)</button></div>
+      <p class="meta-note" style="text-align:center;">저장하면 모든 입주민이 보는 화면이 즉시 업데이트돼요.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="text/plain" id="shellSrc"><!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>프라임하우스 입주민 공간</title>
+<style>
+:root {
+  --cream: #FBF8F2; --yellow: #FFF3D6; --yellow-deep: #F5D978;
+  --sky: #D6ECFB; --sky-deep: #8FCBEF; --lavender: #E8E0FB; --lavender-deep: #BBA3EC;
+  --mint: #D9F2E6; --mint-deep: #7FCDAA; --ink: #2B2620; --ink-soft: #6B6356;
+  --line: #E7E0D2; --card-bg: #FFFFFF; --danger: #D9534F; --radius: 20px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cream: #1C1A16; --yellow: #3A341F; --yellow-deep: #5C512A;
+    --sky: #1C2F3A; --sky-deep: #2E4F63; --lavender: #2A2440; --lavender-deep: #453A6B;
+    --mint: #1D3328; --mint-deep: #2E5443; --ink: #F3EFE6; --ink-soft: #B7AE9C;
+    --line: #38332A; --card-bg: #24211C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --cream: #1C1A16; --yellow: #3A341F; --yellow-deep: #5C512A;
+  --sky: #1C2F3A; --sky-deep: #2E4F63; --lavender: #2A2440; --lavender-deep: #453A6B;
+  --mint: #1D3328; --mint-deep: #2E5443; --ink: #F3EFE6; --ink-soft: #B7AE9C;
+  --line: #38332A; --card-bg: #24211C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--cream); color: var(--ink);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 50; background: var(--cream);
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+#gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.gate-card { background: var(--card-bg); border-radius: 28px; padding: 36px 28px; max-width: 380px; width: 100%; border: 3px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); text-align: center; }
+.gate-emoji { font-size: 44px; margin-bottom: 4px; }
+.gate-card h1 { font-size: 20px; margin: 8px 0 4px; font-weight: 800; }
+.gate-card p { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; line-height: 1.5; }
+.gate-input { width: 100%; padding: 14px 16px; border-radius: 16px; border: 2.5px solid var(--ink); background: var(--cream); font-size: 16px; color: var(--ink); margin-bottom: 10px; text-align: center; letter-spacing: 0.5px; font-weight: 700; }
+.gate-input:focus { outline: none; border-color: var(--sky-deep); }
+.gate-btn { width: 100%; padding: 14px; border-radius: 16px; border: 2.5px solid var(--ink); background: var(--ink); color: var(--cream); font-size: 15px; font-weight: 800; margin-top: 6px; }
+.gate-error { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 16px; }
+.gate-hint { font-size: 12px; color: var(--ink-soft); margin-top: 14px; }
+
+#app { display: none; max-width: 980px; margin: 0 auto; padding: 16px 16px 60px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 4px 16px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; letter-spacing: -0.3px; }
+.brand span.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--mint-deep); }
+
+.tabs-wrap { position: relative; }
+.tabs-wrap::after { content: ""; position: absolute; top: 0; right: 0; width: 28px; height: calc(100% - 14px); background: linear-gradient(to right, transparent, var(--cream)); pointer-events: none; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px; -webkit-overflow-scrolling: touch; }
+.tab-btn { flex: 0 0 auto; background: var(--card-bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; border: 2.5px solid var(--ink); }
+.tab-btn.active { background: var(--yellow-deep); color: var(--ink); border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.block { border-radius: var(--radius); padding: 22px 20px 20px; margin-bottom: 16px; border: 2.5px solid var(--ink); position: relative; }
+.block h2 { font-size: 15.5px; margin: 0 0 14px; display: flex; align-items: center; gap: 6px; font-weight: 800; }
+.bg-yellow { background: var(--yellow); border-top: 7px solid var(--yellow-deep); }
+.bg-sky { background: var(--sky); border-top: 7px solid var(--sky-deep); }
+.bg-lavender { background: var(--lavender); border-top: 7px solid var(--lavender-deep); }
+.bg-mint { background: var(--mint); border-top: 7px solid var(--mint-deep); }
+.bg-white { background: var(--card-bg); border-top: 7px solid var(--ink); }
+
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 720px) { .home-grid { grid-template-columns: 1fr; } }
+.photo-box { width: 100%; aspect-ratio: 16/10; border-radius: 14px; overflow: hidden; background: var(--card-bg); display: flex; align-items: center; justify-content: center; color: var(--ink-soft); font-size: 13px; margin-bottom: 12px; border: 2.5px dashed var(--ink); }
+.photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-box-portrait { aspect-ratio: auto; height: 260px; }
+.contact-row { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; border: 2px solid var(--ink); }
+.contact-row .c-label { font-weight: 700; font-size: 13.5px; }
+.contact-row .c-note { font-size: 11.5px; color: var(--ink-soft); display: block; }
+.trash-row { display: grid; grid-template-columns: 50px 1fr; gap: 10px; align-items: center; padding: 6px 0; font-size: 13.5px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.trash-row:last-child { border-bottom: none; }
+.trash-extra-note { font-size: 11.5px; color: var(--ink-soft); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.ext-summary-ok { color: var(--mint-deep); }
+.ext-summary-warn { color: var(--danger); }
+.trash-row .d { font-weight: 800; }
+.mini-report { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 2px solid var(--ink); }
+.mini-report .mr-top { display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px; }
+.mini-report .mr-title { font-weight: 700; font-size: 13.5px; }
+.ext-badge { border-radius: 999px; padding: 2px 9px; font-size: 10.5px; font-weight: 800; border: 2px solid var(--ink); }
+.ext-overdue { background: var(--danger); color: #fff; }
+.ext-soon { background: var(--yellow-deep); color: var(--ink); }
+.ext-ok { background: var(--mint-deep); color: var(--ink); }
+.parking-diagram { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: var(--card-bg); border: 2.5px solid var(--ink); border-radius: 14px; margin-bottom: 12px; max-width: 100%; box-sizing: border-box; }
+.pm-col { display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; }
+.ps-label { font-size: 11.5px; font-weight: 800; color: var(--ink-soft); margin-bottom: 6px; }
+.parking-grid { display: grid; gap: 4px; flex-shrink: 0; }
+.parking-grid.front { grid-template-columns: repeat(2, 42px); grid-template-rows: repeat(3, 27px); }
+.parking-grid.back { grid-template-columns: repeat(2, 27px); grid-template-rows: 42px; margin-left: 8px; }
+.parking-spot { background: var(--lavender); border: 1.5px solid var(--ink); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; }
+.pm-building { background: var(--sky-deep); color: #fff; border: 1.5px solid var(--ink); border-radius: 8px; width: 38px; height: 93px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10.5px; }
+.pm-road { background: var(--sky-deep); color: #fff; border: 1.5px solid var(--ink); border-radius: 8px; width: 28px; height: 93px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10.5px; }
+.info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.info-row:last-child { border-bottom: none; }
+.info-row .k { color: var(--ink-soft); }
+.info-row .v { font-weight: 600; }
+
+.res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (max-width: 480px) {
+  .res-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .res-card { padding: 18px 14px; }
+  .res-unit { font-size: 18px; }
+  .res-car { font-size: 13.5px; margin-bottom: 12px; }
+  .call-btn { padding: 9px 16px; font-size: 13px; }
+}
+.res-card { background: var(--card-bg); border-radius: 16px; padding: 16px; border: 2.5px solid var(--ink); text-align: center; border-top-width: 6px; }
+.res-card:nth-child(3n+1) { border-top-color: var(--yellow-deep); }
+.res-card:nth-child(3n+2) { border-top-color: var(--sky-deep); }
+.res-card:nth-child(3n+3) { border-top-color: var(--lavender-deep); }
+.res-unit { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.res-car { font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; }
+.call-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--mint-deep); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 800; }
+.call-btn.disabled { background: var(--card-bg); color: var(--ink-soft); border-color: var(--line); pointer-events: none; }
+
+.report-item { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 10px; border: 2.5px solid var(--ink); }
+.report-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.report-date { font-size: 12px; color: var(--ink-soft); }
+.report-cat { font-size: 11px; padding: 3px 10px; border-radius: 999px; background: var(--sky); font-weight: 800; border: 2px solid var(--ink); }
+.report-title { font-size: 15.5px; font-weight: 800; margin: 2px 0 4px; }
+.report-company { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+.report-desc { font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; }
+.empty-note { color: var(--ink-soft); font-size: 13.5px; text-align: center; padding: 24px 0; }
+
+.admin-locked { text-align: center; padding: 60px 20px; color: var(--ink-soft); }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 5px; font-weight: 600; }
+.field input, .field textarea, .field select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card-bg); color: var(--ink); font-size: 14px; }
+.field textarea { min-height: 70px; resize: vertical; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+@media (max-width: 560px) { .row2, .row3 { grid-template-columns: 1fr; } }
+.btn { border: 2px solid var(--ink); border-radius: 12px; padding: 10px 16px; font-size: 13.5px; font-weight: 800; background: var(--ink); color: var(--cream); }
+.btn.secondary { background: var(--card-bg); color: var(--ink); border: 2px solid var(--ink); }
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.small { padding: 7px 12px; font-size: 12.5px; }
+.admin-list-item { display: flex; align-items: center; gap: 8px; background: var(--card-bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; border: 2px solid var(--ink); }
+.admin-list-item .grow { flex: 1; }
+.save-bar { display: flex; justify-content: center; margin-top: 24px; padding-top: 14px; border-top: 2px dashed var(--line); }
+.save-bar button { padding: 13px 28px; border-radius: 999px; font-size: 14.5px; box-shadow: 4px 4px 0 var(--ink); }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--cream); padding: 10px 20px; border-radius: 999px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 100; }
+.toast.show { opacity: 1; }
+.meta-note { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+.divider { height: 1px; background: var(--line); margin: 18px 0; }
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-emoji">🏠</div>
+    <h1>프라임하우스 입주민 공간</h1>
+    <p>등록된 전화번호 또는 공용 암호를 입력해주세요</p>
+    <input id="gateInput" class="gate-input" type="text" inputmode="numeric" placeholder="전화번호 또는 암호" autocomplete="off">
+    <button class="gate-btn" onclick="tryEnter()">입장하기</button>
+    <div class="gate-error" id="gateError"></div>
+    <div class="gate-hint">이 공간은 입주민 전용입니다</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>프라임하우스</div>
+  </div>
+  <div class="tabs-wrap"><div class="tabs" id="tabBar"></div></div>
+
+  <div id="view-home" class="view">
+    <p style="font-size:13.5px; color:var(--ink-soft); margin:0 0 14px; padding:0 2px;">프라임하우스 입주민을 위한 페이지입니다.</p>
+    <div class="home-grid">
+      <div>
+        <div class="block bg-sky" style="margin-bottom:14px;">
+          <h2>🏢 건물 정보</h2>
+          <div class="photo-box photo-box-portrait" id="buildingPhotoBox">사진 준비 중</div>
+          <div class="info-row"><span class="k">주소</span><span class="v" id="hAddress">-</span></div>
+        </div>
+        <div class="block bg-lavender">
+          <h2>🚗 주차장</h2>
+          <div id="parkingPhotoBox"></div>
+          <div class="info-row"><span class="k">주차 면수</span><span class="v" id="pSpots">-</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="block bg-mint" style="margin-bottom:14px;">
+          <h2>☎️ 비상 연락처</h2>
+          <div id="emergencyList"></div>
+        </div>
+        <div class="block bg-yellow" style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:6px;">
+            <h2 style="margin:0;">🗑️ 분리수거 요일표 <span id="trashTimeLabel" style="font-size:12px; color:var(--ink-soft); font-weight:600;"></span></h2>
+            <a id="trashLinkBtn" class="call-btn" href="#" target="_blank" rel="noopener" style="display:none;">🔗 링크</a>
+          </div>
+          <div id="trashTable"></div>
+        </div>
+        <div class="block bg-white" style="margin-bottom:14px; padding:16px 20px;">
+          <div id="extSummaryText" style="font-size:13.5px; font-weight:700;"></div>
+        </div>
+        <div class="block bg-white">
+          <h2>📋 최근 공지 (2건)</h2>
+          <div id="recentReports"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-residents" class="view">
+    <div class="block bg-white">
+      <h2>👥 입주자 정보</h2>
+      <div class="res-grid" id="residentGrid"></div>
+    </div>
+  </div>
+
+  <div id="view-extinguisher" class="view">
+    <div class="block bg-white">
+      <h2>🧯 소화기 현황</h2>
+      <div id="extinguisherList"></div>
+    </div>
+  </div>
+
+  <div id="view-reports" class="view">
+    <div class="block bg-white">
+      <h2>🛠️ 관리 리포트</h2>
+      <div id="reportList"></div>
+    </div>
+  </div>
+
+  <div id="view-admin" class="view">
+    <div id="adminLocked" class="admin-locked" style="display:none;">🔒 관리자만 이용할 수 있는 탭이에요</div>
+    <div id="adminContent" style="display:none;">
+      <div class="block bg-yellow">
+        <h2>🔑 입장 코드 (전화번호)</h2>
+        <div id="phoneList"></div>
+        <div class="row3">
+          <div class="field" style="margin-bottom:0;"><label>호수(메모)</label><input id="newPhoneLabel" placeholder="예: 201호"></div>
+          <div class="field" style="margin-bottom:0;"><label>전화번호</label><input id="newPhoneNum" placeholder="01012345678" inputmode="numeric"></div>
+          <button class="btn small" id="addPhoneBtn" onclick="addPhone()">추가</button>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+          <label>공용 암호 (선택사항, 전체 입주민 공유용)</label>
+          <div class="row3">
+            <input id="sharedPwInput" placeholder="예: 2026" style="grid-column: span 2;">
+            <button class="btn small" onclick="setSharedPw()">설정</button>
+          </div>
+          <div class="meta-note" id="sharedPwMeta">설정된 공용 암호 없음</div>
+        </div>
+      </div>
+
+      <div class="block bg-sky">
+        <h2>🏢 건물 정보 수정</h2>
+        <div class="field"><label>주소</label><input id="editAddress" onchange="STATE.building.address=this.value"></div>
+        <div class="field"><label>건물 외관 사진</label><input type="file" accept="image/*" id="fileBuilding" onchange="uploadPhoto(this,'building')"></div>
+        <div class="divider"></div>
+        <div class="field"><label>주차 면수</label><input id="editSpots" onchange="STATE.parking.spots=this.value"></div>
+
+      </div>
+
+      <div class="block bg-mint">
+        <h2>☎️ 비상 연락처 수정</h2>
+        <div id="emergencyEditList"></div>
+        <div class="row3">
+          <div class="field" style="margin-bottom:0;"><label>이름/역할</label><input id="newEmergLabel" placeholder="예: 동 대표(201호)"></div>
+          <div class="field" style="margin-bottom:0;"><label>전화번호</label><input id="newEmergPhone" placeholder="01000000000" inputmode="numeric"></div>
+          <button class="btn small" id="addEmergBtn" onclick="addEmergency()">추가</button>
+        </div>
+        <div class="field"><label>비고 (선택)</label><input id="newEmergNote" placeholder="예: 평일 10:30~17:00"></div>
+      </div>
+
+      <div class="block bg-yellow">
+        <h2>🗑️ 분리수거 요일표 수정</h2>
+        <div id="trashScheduleEdit"></div>
+        <div class="divider"></div>
+        <div class="field"><label>배출 가능 시간 (선택)</label><input id="editTrashTime" placeholder="예: 18:00 ~ 24:00" onchange="STATE.trashTime=this.value"></div>
+        <div class="row2">
+          <div class="field"><label>참고 링크 이름 (선택)</label><input id="editTrashLinkLabel" placeholder="예: 광진구 분리수거 안내" onchange="STATE.trashLink=STATE.trashLink||{}; STATE.trashLink.label=this.value"></div>
+          <div class="field"><label>참고 링크 주소 (선택)</label><input id="editTrashLinkUrl" placeholder="https://..." onchange="STATE.trashLink=STATE.trashLink||{}; STATE.trashLink.url=this.value"></div>
+        </div>
+      </div>
+
+      <div class="block bg-lavender">
+        <h2>👥 입주자 정보 수정</h2>
+        <div id="residentEditList"></div>
+      </div>
+
+      <div class="block bg-sky">
+        <h2>🧯 소화기 현황 관리</h2>
+        <div id="extinguisherEditList"></div>
+        <div class="row2">
+          <div class="field"><label>위치</label><input id="newExtLocation" placeholder="예: 1층 복도"></div>
+          <div class="field"><label>구매 연월</label><input type="month" id="newExtPurchase"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>수량</label><input id="newExtQty" placeholder="예: 1"></div>
+          <div class="field"><label>최근 점검일</label><input type="date" id="newExtCheck"></div>
+        </div>
+        <div class="field"><label>비고</label><input id="newExtNote" placeholder="특이사항"></div>
+        <button class="btn small" id="addExtBtn" onclick="addExtinguisher()">추가</button>
+      </div>
+
+      <div class="block bg-mint">
+        <h2>🛠️ 관리 리포트 작성</h2>
+        <div class="row2">
+          <div class="field"><label>날짜</label><input type="date" id="newReportDate"></div>
+          <div class="field"><label>분류</label>
+            <select id="newReportCat"><option>시설 점검</option><option>보수 공사</option><option>청소</option><option>안내</option><option>기타</option></select>
+          </div>
+        </div>
+        <div class="field"><label>제목</label><input id="newReportTitle" placeholder="예: 승강기 정기검사"></div>
+        <div class="field"><label>업체명</label><input id="newReportCompany" placeholder="예: OO엘리베이터"></div>
+        <div class="field"><label>내용</label><textarea id="newReportDesc"></textarea></div>
+        <button class="btn small" id="addReportBtn" onclick="addReport()">리포트 등록</button>
+        <div class="divider"></div>
+        <div id="reportEditList"></div>
+      </div>
+
+      <div class="save-bar"><button class="btn" onclick="saveAll()">변경사항 저장 (전체 반영)</button></div>
+      <p class="meta-note" style="text-align:center;">저장하면 모든 입주민이 보는 화면이 즉시 업데이트돼요.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</script>
+<script>
+const STATE = {"meta": {"lastUpdated": "2026-11-16T14:35:20.021Z", "version": 1}, "auth": {"codes": [], "sharedPassword": {"hash": "158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab", "setDate": "2026-11-16"}}, "building": {"address": "서울특별시 광진구 동일로70길 54 (중곡동, 프라임하우스)", "photo": "/_blob/3c99f5f29d41bd4dfb36e153fe9a3feb"}, "parking": {"spots": "8면", "photo": null}, "emergency": [{"label": "관리업체(빌즈)", "phone": "16601635", "note": "평일 10:30~17:00"}, {"label": "동 대표", "phone": "", "note": ""}, {"label": "소방안전관리자(201호)", "phone": "01052032774", "note": ""}], "trashLink": {"label": "분리수거 안내", "url": "https://www.gwangjin.go.kr/portal/main/contents.do?menuNo=200838"}, "trashSchedule": [{"day": "월", "type": "일반쓰레기, 음식물, 재활용 배출"}, {"day": "화", "type": "일반쓰레기, 음식물, 재활용 배출"}, {"day": "수", "type": "일반쓰레기, 음식물, 재활용 배출"}, {"day": "목", "type": "일반쓰레기, 음식물, 재활용 배출"}, {"day": "금", "type": "일반쓰레기, 음식물, 재활용 배출"}, {"day": "토", "type": "미 배출"}, {"day": "일", "type": "일반쓰레기, 음식물, 재활용 배출"}, {"day": "공휴일 전일", "type": "미 배출"}], "residents": [{"unit": "201호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "202호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "301호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "302호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "401호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "402호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "501호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "502호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "601호", "car": "00어0000", "phone": "010-0000-0000"}, {"unit": "602호", "car": "00어0000", "phone": "010-0000-0000"}], "reports": [{"date": "2026-11-16", "category": "청소", "title": "(테스트)", "company": "OO엘리베이터", "desc": "11월 정기 점검"}], "trashTime": "18:00 ~ 24:00", "extinguishers": [{"location": "1층 복도 (테스트)", "purchaseDate": "2026-11", "quantity": "1", "lastCheck": "2026-11-16", "note": ""}]};
+function appMain(){
+async function sha256Hex(text) {
+  const enc = new TextEncoder().encode(text.trim());
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+async function tryEnter() {
+  const val = document.getElementById('gateInput').value;
+  if (!val.trim()) return;
+  const hash = await sha256Hex(val);
+  const okPhone = (STATE.auth.codes||[]).some(c => c.hash === hash);
+  const okShared = STATE.auth.sharedPassword && STATE.auth.sharedPassword.hash === hash;
+  if (okPhone || okShared) {
+    sessionStorage.setItem('__gate_ok', '1');
+    enterApp();
+  } else {
+    document.getElementById('gateError').textContent = '등록되지 않은 번호/암호예요. 관리자에게 문의해주세요.';
+  }
+}
+function enterApp() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  renderAll();
+}
+const TABS = [
+  {id:'home', label:'\uD83C\uDFE0 홈'},
+  {id:'residents', label:'\uD83D\uDC65 입주자 정보'},
+  {id:'extinguisher', label:'\uD83E\uDDEF 소화기 현황'},
+  {id:'reports', label:'\uD83D\uDEE0\uFE0F 관리 리포트'},
+  {id:'admin', label:'\uD83D\uDD10 관리자'}
+];
+let currentTab = 'home';
+function renderTabs() {
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = '';
+  TABS.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'tab-btn' + (t.id===currentTab ? ' active' : '');
+    b.textContent = t.label;
+    b.onclick = () => switchTab(t.id);
+    bar.appendChild(b);
+  });
+}
+function switchTab(id) {
+  currentTab = id;
+  renderTabs();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  if (id === 'admin') renderAdmin();
+}
+function photoBox(el, url) {
+  if (url) { el.innerHTML = '<img src="'+url+'">'; }
+  else { el.textContent = '사진 준비 중'; }
+}
+function renderHome() {
+  const b = STATE.building;
+  photoBox(document.getElementById('buildingPhotoBox'), b.photo);
+  const addrEl = document.getElementById('hAddress');
+  const addrVal = b.address || '-';
+  const parenIdx = addrVal.indexOf('(');
+  if (parenIdx > 0) {
+    addrEl.innerHTML = addrVal.slice(0, parenIdx).trim() + '<br>' + addrVal.slice(parenIdx).trim();
+  } else {
+    addrEl.textContent = addrVal;
+  }
+  renderParkingDiagram();
+  document.getElementById('pSpots').textContent = STATE.parking.spots || '-';
+  renderEmergencyList();
+  renderTrashTable();
+  renderExtinguisherSummary();
+  renderRecentReports();
+}
+function renderParkingDiagram() {
+  const el = document.getElementById('parkingPhotoBox');
+  if (!el) return;
+  const frontSpots = [1,2,3,4,5,6].map(i => '<div class="parking-spot">'+i+'</div>').join('');
+  const backSpots = [7,8].map(i => '<div class="parking-spot">'+i+'</div>').join('');
+  el.innerHTML = '<div class="parking-diagram">'
+    + '<div class="pm-road">도로</div>'
+    + '<div class="parking-grid front">'+frontSpots+'</div>'
+    + '<div class="pm-building">건물</div>'
+    + '<div class="parking-grid back">'+backSpots+'</div>'
+    + '</div>';
+}
+function renderEmergencyList() {
+  const el = document.getElementById('emergencyList');
+  if (!el) return;
+  const list = STATE.emergency || [];
+  if (!list.length) { el.innerHTML = '<div class="empty-note">등록된 연락처가 없어요</div>'; return; }
+  el.innerHTML = '';
+  list.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'contact-row';
+    const noteHtml = c.note ? ('<span class="c-note">'+c.note+'</span>') : '';
+    row.innerHTML = '<span><span class="c-label">'+(c.label||'')+'</span>'+noteHtml+'</span>'
+      + (c.phone ? '<a class="call-btn" href="tel:'+c.phone+'">\uD83D\uDCDE 전화</a>' : '');
+    el.appendChild(row);
+  });
+}
+function renderTrashTable() {
+  const el = document.getElementById('trashTable');
+  if (!el) return;
+  const stdDays = ['월','화','수','목','금','토','일'];
+  const sched = STATE.trashSchedule || [];
+  const weekRows = sched.filter(s => stdDays.indexOf(s.day) !== -1);
+  const extraRows = sched.filter(s => stdDays.indexOf(s.day) === -1);
+  el.innerHTML = '';
+  weekRows.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'trash-row';
+    row.innerHTML = '<span class="d">'+s.day+'</span><span>'+(s.type||'-')+'</span>';
+    el.appendChild(row);
+  });
+  extraRows.forEach(s => {
+    const note = document.createElement('div');
+    note.className = 'trash-extra-note';
+    note.textContent = s.day + ': ' + (s.type||'-');
+    el.appendChild(note);
+  });
+  const timeLabel = document.getElementById('trashTimeLabel');
+  if (timeLabel) timeLabel.textContent = STATE.trashTime ? ('(' + STATE.trashTime + ')') : '';
+  const linkBtn = document.getElementById('trashLinkBtn');
+  if (linkBtn) {
+    const tl = STATE.trashLink;
+    if (tl && tl.url) {
+      linkBtn.style.display = 'inline-flex';
+      linkBtn.href = tl.url;
+      linkBtn.textContent = '\uD83D\uDD17 ' + (tl.label || '링크');
+    } else {
+      linkBtn.style.display = 'none';
+    }
+  }
+}
+function renderRecentReports() {
+  const el = document.getElementById('recentReports');
+  if (!el) return;
+  const reports = (STATE.reports||[]).slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'')).slice(0,2);
+  if (!reports.length) { el.innerHTML = '<div class="empty-note">최근 등록된 공지가 없어요</div>'; return; }
+  el.innerHTML = '';
+  reports.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'mini-report';
+    item.innerHTML = '<div class="mr-top"><span>'+(r.category||'')+'</span><span>'+(r.date||'')+'</span></div>'
+      + '<div class="mr-title">'+(r.title||'')+'</div>';
+    el.appendChild(item);
+  });
+}
+function renderResidents() {
+  const grid = document.getElementById('residentGrid');
+  grid.innerHTML = '';
+  (STATE.residents||[]).forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'res-card';
+    const telBtn = r.phone
+      ? '<a class="call-btn" href="tel:'+r.phone+'">\uD83D\uDCDE 전화걸기</a>'
+      : '<span class="call-btn disabled">번호 없음</span>';
+    card.innerHTML = '<div class="res-unit">'+(r.unit||'-')+'</div>'
+      + '<div class="res-car">'+(r.car || '차량번호 미등록')+'</div>'
+      + telBtn;
+    grid.appendChild(card);
+  });
+}
+function renderReports() {
+  const list = document.getElementById('reportList');
+  const reports = (STATE.reports||[]).slice().sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+  if (!reports.length) { list.innerHTML = '<div class="empty-note">아직 등록된 리포트가 없어요</div>'; return; }
+  list.innerHTML = '';
+  reports.forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'report-item';
+    item.innerHTML = '<div class="report-top"><span class="report-cat">'+(r.category||'기타')+'</span><span class="report-date">'+(r.date||'')+'</span></div>'
+      + '<div class="report-title">'+(r.title||'')+'</div>'
+      + (r.company ? '<div class="report-company">'+r.company+'</div>' : '')
+      + '<div class="report-desc">'+(r.desc||'')+'</div>';
+    list.appendChild(item);
+  });
+}
+function extDueDate(purchaseDate) {
+  if (!purchaseDate) return null;
+  const p = new Date(purchaseDate + '-01T00:00:00');
+  if (isNaN(p.getTime())) return null;
+  const due = new Date(p);
+  due.setFullYear(due.getFullYear() + 10);
+  return due;
+}
+function extStatus(purchaseDate) {
+  const due = extDueDate(purchaseDate);
+  if (!due) return {label:'', cls:'', dueStr:'-'};
+  const dueStr = due.getFullYear() + '-' + String(due.getMonth()+1).padStart(2,'0');
+  const diffDays = (due - new Date()) / (1000*60*60*24);
+  if (diffDays < 0) return {label:'\u26A0\uFE0F 교체 필요', cls:'ext-overdue', dueStr};
+  if (diffDays < 180) return {label:'\uD83D\uDFE0 교체임박', cls:'ext-soon', dueStr};
+  return {label:'정상', cls:'ext-ok', dueStr};
+}
+function renderExtinguisherSummary() {
+  const el = document.getElementById('extSummaryText');
+  if (!el) return;
+  const list = STATE.extinguishers || [];
+  if (!list.length) { el.innerHTML = '\uD83E\uDDEF 소화기 등록된 정보가 없어요'; return; }
+  let warnCount = 0;
+  list.forEach(ex => {
+    const st = extStatus(ex.purchaseDate);
+    if (st.cls === 'ext-overdue' || st.cls === 'ext-soon') warnCount++;
+  });
+  const warnHtml = warnCount > 0
+    ? '<span class="ext-summary-warn">\u26A0\uFE0F 교체임박/필요 '+warnCount+'건</span>'
+    : '<span class="ext-summary-ok">\u2705 전부 정상</span>';
+  el.innerHTML = '\uD83E\uDDEF 소화기 총 '+list.length+'개 \u00B7 ' + warnHtml;
+}
+function renderExtinguisherList() {
+  const el = document.getElementById('extinguisherList');
+  if (!el) return;
+  const list = STATE.extinguishers || [];
+  if (!list.length) { el.innerHTML = '<div class="empty-note">등록된 소화기가 없어요</div>'; return; }
+  el.innerHTML = '';
+  list.forEach(ex => {
+    const st = extStatus(ex.purchaseDate);
+    const item = document.createElement('div');
+    item.className = 'report-item';
+    item.innerHTML = '<div class="report-top"><span class="report-cat">'+(ex.location||'')+'</span>'
+      + (st.label ? '<span class="ext-badge '+st.cls+'">'+st.label+'</span>' : '') + '</div>'
+      + '<div class="report-title">수량 '+(ex.quantity||'-')+'개</div>'
+      + '<div class="report-company">구매 '+(ex.purchaseDate||'-')+' \u00B7 교체예정 '+st.dueStr+' \u00B7 최근점검 '+(ex.lastCheck||'-')+'</div>'
+      + (ex.note ? '<div class="report-desc">'+ex.note+'</div>' : '');
+    el.appendChild(item);
+  });
+}
+async function addExtinguisher() {
+  const location = document.getElementById('newExtLocation').value.trim();
+  if (!location) { showToast('위치를 입력해주세요'); return; }
+  const entry = {
+    location,
+    purchaseDate: document.getElementById('newExtPurchase').value,
+    quantity: document.getElementById('newExtQty').value.trim(),
+    lastCheck: document.getElementById('newExtCheck').value,
+    note: document.getElementById('newExtNote').value.trim()
+  };
+  STATE.extinguishers = STATE.extinguishers || [];
+  if (editingExtIndex !== null) {
+    STATE.extinguishers[editingExtIndex] = entry;
+    editingExtIndex = null;
+    showToast('소화기 정보가 수정됐어요. 저장을 눌러야 반영돼요.');
+  } else {
+    STATE.extinguishers.push(entry);
+    showToast('소화기가 추가됐어요. 저장을 눌러야 반영돼요.');
+  }
+  document.getElementById('newExtLocation').value = '';
+  document.getElementById('newExtPurchase').value = '';
+  document.getElementById('newExtQty').value = '';
+  document.getElementById('newExtCheck').value = '';
+  document.getElementById('newExtNote').value = '';
+  renderAdmin();
+}
+function editExtinguisher(i) {
+  const ex = STATE.extinguishers[i];
+  editingExtIndex = i;
+  document.getElementById('newExtLocation').value = ex.location || '';
+  document.getElementById('newExtPurchase').value = ex.purchaseDate || '';
+  document.getElementById('newExtQty').value = ex.quantity || '';
+  document.getElementById('newExtCheck').value = ex.lastCheck || '';
+  document.getElementById('newExtNote').value = ex.note || '';
+  renderAdmin();
+  showToast('내용을 수정하고 "수정 완료"를 눌러주세요');
+}
+function removeExtinguisher(i) {
+  STATE.extinguishers.splice(i,1);
+  if (editingExtIndex === i) editingExtIndex = null;
+  renderAdmin();
+}
+let canEdit = false;
+let editingPhoneIndex = null;
+let editingEmergIndex = null;
+let editingReportIndex = null;
+let editingExtIndex = null;
+async function checkEditPermission() {
+  try {
+    const user = await claude.use('user');
+    if (!user) { canEdit = false; return; }
+    let owner = false, editor = false;
+    try { owner = await user.isOwner(); } catch(e) {}
+    try { editor = await user.canEdit(); } catch(e) {}
+    canEdit = !!(owner || editor);
+  } catch(e) { canEdit = false; }
+}
+function renderAdmin() {
+  document.getElementById('adminLocked').style.display = canEdit ? 'none' : 'block';
+  document.getElementById('adminContent').style.display = canEdit ? 'block' : 'none';
+  if (!canEdit) return;
+  const pl = document.getElementById('phoneList');
+  pl.innerHTML = '';
+  const sp = STATE.auth.sharedPassword;
+  if (sp) {
+    const spRow = document.createElement('div');
+    spRow.className = 'admin-list-item';
+    spRow.innerHTML = '<span class="grow">\uD83D\uDD11 공용 암호 \u00B7 설정됨 ('+sp.setDate+')</span>'
+      + '<button class="btn small danger" onclick="removeSharedPw()">삭제</button>';
+    pl.appendChild(spRow);
+  }
+  (STATE.auth.codes||[]).forEach((c, i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-list-item';
+    const mask = c.last4 ? ('\u2022\u2022\u2022\u2022'+c.last4) : '등록됨';
+    row.innerHTML = '<span class="grow">'+(c.label||'(이름없음)')+' \u00B7 '+mask+'</span>'
+      + '<button class="btn small secondary" onclick="editPhone('+i+')">수정</button>'
+      + '<button class="btn small danger" onclick="removePhone('+i+')">삭제</button>';
+    pl.appendChild(row);
+  });
+  const addBtn = document.getElementById('addPhoneBtn');
+  if (addBtn) addBtn.textContent = (editingPhoneIndex !== null) ? '수정 완료' : '추가';
+  document.getElementById('editAddress').value = STATE.building.address || '';
+  document.getElementById('editSpots').value = STATE.parking.spots || '';
+
+  const eel = document.getElementById('emergencyEditList');
+  eel.innerHTML = '';
+  (STATE.emergency||[]).forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-list-item';
+    row.innerHTML = '<span class="grow">'+(c.label||'')+' \u00B7 '+(c.phone||'')+(c.note ? (' \u00B7 '+c.note) : '')+'</span>'
+      + '<button class="btn small secondary" onclick="editEmergency('+i+')">수정</button>'
+      + '<button class="btn small danger" onclick="removeEmergency('+i+')">삭제</button>';
+    eel.appendChild(row);
+  });
+  const addEmergBtn = document.getElementById('addEmergBtn');
+  if (addEmergBtn) addEmergBtn.textContent = (editingEmergIndex !== null) ? '수정 완료' : '추가';
+
+  const tel = document.getElementById('trashScheduleEdit');
+  tel.innerHTML = '';
+  (STATE.trashSchedule||[]).forEach((s,i) => {
+    const row = document.createElement('div');
+    row.className = 'row2';
+    row.style.marginBottom = '8px';
+    row.innerHTML = '<div style="font-weight:700; align-self:center;">'+s.day+'</div>'
+      + '<input value="'+(s.type||'')+'" onchange="STATE.trashSchedule['+i+'].type=this.value" placeholder="예: 일반쓰레기">';
+    tel.appendChild(row);
+  });
+  document.getElementById('editTrashTime').value = STATE.trashTime || '';
+  const tl = STATE.trashLink || {};
+  document.getElementById('editTrashLinkLabel').value = tl.label || '';
+  document.getElementById('editTrashLinkUrl').value = tl.url || '';
+
+  const rel = document.getElementById('residentEditList');
+  rel.innerHTML = '';
+  (STATE.residents||[]).forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'row3';
+    row.style.marginBottom = '10px';
+    row.innerHTML = '<input value="'+(r.unit||'')+'" onchange="STATE.residents['+i+'].unit=this.value" placeholder="호수">'
+      + '<input value="'+(r.car||'')+'" onchange="STATE.residents['+i+'].car=this.value" placeholder="차량번호">'
+      + '<input value="'+(r.phone||'')+'" onchange="STATE.residents['+i+'].phone=this.value" placeholder="전화번호">';
+    rel.appendChild(row);
+  });
+  const exel = document.getElementById('extinguisherEditList');
+  exel.innerHTML = '';
+  (STATE.extinguishers||[]).forEach((ex,i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-list-item';
+    row.innerHTML = '<span class="grow">'+(ex.location||'')+' \u00B7 '+(ex.quantity||'-')+'개 \u00B7 '+(ex.purchaseDate||'-')+'</span>'
+      + '<button class="btn small secondary" onclick="editExtinguisher('+i+')">수정</button>'
+      + '<button class="btn small danger" onclick="removeExtinguisher('+i+')">삭제</button>';
+    exel.appendChild(row);
+  });
+  const addExtBtn = document.getElementById('addExtBtn');
+  if (addExtBtn) addExtBtn.textContent = (editingExtIndex !== null) ? '수정 완료' : '추가';
+
+  const rpl = document.getElementById('reportEditList');
+  rpl.innerHTML = '';
+  (STATE.reports||[]).forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-list-item';
+    row.innerHTML = '<span class="grow">'+(r.date||'')+' \u00B7 '+(r.title||'')+'</span>'
+      + '<button class="btn small secondary" onclick="editReport('+i+')">수정</button>'
+      + '<button class="btn small danger" onclick="removeReport('+i+')">삭제</button>';
+    rpl.appendChild(row);
+  });
+  const addReportBtn = document.getElementById('addReportBtn');
+  if (addReportBtn) addReportBtn.textContent = (editingReportIndex !== null) ? '수정 완료' : '리포트 등록';
+}
+async function addPhone() {
+  const label = document.getElementById('newPhoneLabel').value.trim();
+  const num = document.getElementById('newPhoneNum').value.trim();
+  if (!num) { showToast('전화번호를 입력해주세요'); return; }
+  const hash = await sha256Hex(num);
+  const last4 = num.slice(-4);
+  STATE.auth.codes = STATE.auth.codes || [];
+  if (editingPhoneIndex !== null) {
+    STATE.auth.codes[editingPhoneIndex] = {label: label || '(이름없음)', hash, last4};
+    editingPhoneIndex = null;
+    showToast('번호가 수정됐어요. 저장을 눌러야 반영돼요.');
+  } else {
+    STATE.auth.codes.push({label: label || '(이름없음)', hash, last4});
+    showToast('번호가 추가됐어요. 저장을 눌러야 반영돼요.');
+  }
+  document.getElementById('newPhoneLabel').value = '';
+  document.getElementById('newPhoneNum').value = '';
+  renderAdmin();
+}
+function editPhone(i) {
+  const c = STATE.auth.codes[i];
+  editingPhoneIndex = i;
+  document.getElementById('newPhoneLabel').value = c.label || '';
+  document.getElementById('newPhoneNum').value = '';
+  document.getElementById('newPhoneNum').placeholder = '새 번호를 입력하세요';
+  renderAdmin();
+  showToast('새 번호를 입력하고 "수정 완료"를 눌러주세요');
+}
+function removePhone(i) {
+  STATE.auth.codes.splice(i,1);
+  if (editingPhoneIndex === i) editingPhoneIndex = null;
+  renderAdmin();
+}
+function removeSharedPw() { STATE.auth.sharedPassword = null; renderAdmin(); showToast('공용 암호가 삭제됐어요. 저장을 눌러야 반영돼요.'); }
+async function setSharedPw() {
+  const val = document.getElementById('sharedPwInput').value.trim();
+  if (!val) return;
+  const hash = await sha256Hex(val);
+  const today = new Date().toISOString().slice(0,10);
+  STATE.auth.sharedPassword = {hash, setDate: today};
+  document.getElementById('sharedPwInput').value = '';
+  renderAdmin();
+  showToast('공용 암호가 설정됐어요. 저장을 눌러야 반영돼요.');
+}
+function addReport() {
+  const date = document.getElementById('newReportDate').value || new Date().toISOString().slice(0,10);
+  const title = document.getElementById('newReportTitle').value.trim();
+  if (!title) { showToast('제목을 입력해주세요'); return; }
+  const entry = {
+    date, category: document.getElementById('newReportCat').value,
+    title, company: document.getElementById('newReportCompany').value.trim(),
+    desc: document.getElementById('newReportDesc').value.trim()
+  };
+  STATE.reports = STATE.reports || [];
+  if (editingReportIndex !== null) {
+    STATE.reports[editingReportIndex] = entry;
+    editingReportIndex = null;
+    showToast('리포트가 수정됐어요. 저장을 눌러야 반영돼요.');
+  } else {
+    STATE.reports.push(entry);
+    showToast('리포트가 추가됐어요. 저장을 눌러야 반영돼요.');
+  }
+  document.getElementById('newReportDate').value = '';
+  document.getElementById('newReportTitle').value = '';
+  document.getElementById('newReportCompany').value = '';
+  document.getElementById('newReportDesc').value = '';
+  renderAdmin();
+}
+function editReport(i) {
+  const r = STATE.reports[i];
+  editingReportIndex = i;
+  document.getElementById('newReportDate').value = r.date || '';
+  document.getElementById('newReportCat').value = r.category || '시설 점검';
+  document.getElementById('newReportTitle').value = r.title || '';
+  document.getElementById('newReportCompany').value = r.company || '';
+  document.getElementById('newReportDesc').value = r.desc || '';
+  renderAdmin();
+  showToast('내용을 수정하고 "수정 완료"를 눌러주세요');
+}
+function removeReport(i) {
+  STATE.reports.splice(i,1);
+  if (editingReportIndex === i) editingReportIndex = null;
+  renderAdmin();
+}
+function addEmergency() {
+  const label = document.getElementById('newEmergLabel').value.trim();
+  const phone = document.getElementById('newEmergPhone').value.trim();
+  const note = document.getElementById('newEmergNote').value.trim();
+  if (!label || !phone) { showToast('이름/역할과 전화번호를 입력해주세요'); return; }
+  const entry = {label, phone, note};
+  STATE.emergency = STATE.emergency || [];
+  if (editingEmergIndex !== null) {
+    STATE.emergency[editingEmergIndex] = entry;
+    editingEmergIndex = null;
+    showToast('연락처가 수정됐어요. 저장을 눌러야 반영돼요.');
+  } else {
+    STATE.emergency.push(entry);
+    showToast('연락처가 추가됐어요. 저장을 눌러야 반영돼요.');
+  }
+  document.getElementById('newEmergLabel').value = '';
+  document.getElementById('newEmergPhone').value = '';
+  document.getElementById('newEmergNote').value = '';
+  renderAdmin();
+}
+function editEmergency(i) {
+  const c = STATE.emergency[i];
+  editingEmergIndex = i;
+  document.getElementById('newEmergLabel').value = c.label || '';
+  document.getElementById('newEmergPhone').value = c.phone || '';
+  document.getElementById('newEmergNote').value = c.note || '';
+  renderAdmin();
+  showToast('내용을 수정하고 "수정 완료"를 눌러주세요');
+}
+function removeEmergency(i) {
+  STATE.emergency.splice(i,1);
+  if (editingEmergIndex === i) editingEmergIndex = null;
+  renderAdmin();
+}
+async function uploadPhoto(input, target) {
+  const file = input.files[0];
+  if (!file) return;
+  try {
+    const assets = await claude.use('assets');
+    if (!assets) { showToast('이미지 업로드를 사용할 수 없어요 (권한 없음)'); return; }
+    const res = await assets.upload(file);
+    if (!res || !res.url) { showToast('업로드 응답에 url이 없어요'); return; }
+    if (target === 'building') STATE.building.photo = res.url;
+    if (target === 'parking') STATE.parking.photo = res.url;
+    renderHome();
+    showToast('사진 업로드 성공! 홈 탭에서 바로 보여요. 저장을 눌러야 다른 사람도 볼 수 있어요.');
+  } catch(e) { showToast('업로드 실패: ' + (e && e.message ? e.message : JSON.stringify(e))); }
+}
+function buildFullHtml(state) {
+  const CLOSE_SCRIPT = '<' + '/script';
+  const shell = document.getElementById('shellSrc').textContent;
+  const stateJson = JSON.stringify(state).split(CLOSE_SCRIPT).join('<\\' + '/script');
+  const logicSrc = appMain.toString();
+  return shell
+    + '<script type="text/plain" id="shellSrc">' + shell.split(CLOSE_SCRIPT).join('&lt;' + '/script') + '</' + 'script>'
+    + '<script>const STATE = ' + stateJson + ';\n(' + logicSrc + ')();</' + 'script>'
+    + '</body></html>';
+}
+async function saveAll() {
+  showToast('저장 중...');
+  STATE.building.address = document.getElementById('editAddress').value;
+  STATE.parking.spots = document.getElementById('editSpots').value;
+  STATE.trashTime = document.getElementById('editTrashTime').value.trim();
+  STATE.trashLink = {
+    label: document.getElementById('editTrashLinkLabel').value.trim(),
+    url: document.getElementById('editTrashLinkUrl').value.trim()
+  };
+  STATE.meta = STATE.meta || {};
+  STATE.meta.lastUpdated = new Date().toISOString();
+  try {
+    const artifact = await claude.use('artifact');
+    if (!artifact) { showToast('저장 권한이 없어요'); return; }
+    const html = buildFullHtml(STATE);
+    const result = await artifact.publish(html);
+    if (result) { showToast('저장 완료! 모든 입주민 화면에 반영됐어요.'); renderAll(); }
+    else { showToast('저장에 실패했어요'); }
+  } catch(e) { showToast('저장 중 오류가 발생했어요'); }
+}
+function renderAll() {
+  renderTabs(); switchTab(currentTab);
+  renderHome(); renderResidents(); renderExtinguisherList(); renderReports();
+}
+window.tryEnter = tryEnter;
+window.addPhone = addPhone;
+window.editPhone = editPhone;
+window.removePhone = removePhone;
+window.setSharedPw = setSharedPw;
+window.removeSharedPw = removeSharedPw;
+window.addReport = addReport;
+window.removeReport = removeReport;
+window.addEmergency = addEmergency;
+window.editEmergency = editEmergency;
+window.removeEmergency = removeEmergency;
+window.editReport = editReport;
+window.addExtinguisher = addExtinguisher;
+window.editExtinguisher = editExtinguisher;
+window.removeExtinguisher = removeExtinguisher;
+window.uploadPhoto = uploadPhoto;
+window.saveAll = saveAll;
+
+document.getElementById('gateInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryEnter(); });
+checkEditPermission().then(() => {
+  if (canEdit || sessionStorage.getItem('__gate_ok') === '1') enterApp();
+});
+}
+appMain();
+</script>
+</body>
+</html>
